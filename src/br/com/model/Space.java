@@ -1,5 +1,8 @@
 package br.com.model;
 
+import lombok.Getter;
+
+@Getter
 public final class Space {
 
     private Integer actual;
@@ -17,11 +20,6 @@ public final class Space {
         }
     }
 
-    public Integer getActual() {
-
-        return actual;
-    }
-
     public void setActual(final Integer actual) {
 
         if(fixed) return;
@@ -34,13 +32,4 @@ public final class Space {
         setActual(null);
     }
 
-    public int getExpected() {
-
-        return expected;
-    }
-
-    public boolean isFixed() {
-
-        return fixed;
-    }
 }

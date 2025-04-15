@@ -1,13 +1,13 @@
 import br.com.model.Board;
 import br.com.model.Space;
 
-import java.sql.Array;
+import java.util.Scanner;
+import java.util.stream.Stream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.stream.Stream;
 
+import static br.com.util.BoardTemplate.BOARD_TEMPLATE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
@@ -22,7 +22,7 @@ public class Main {
 
         final Map<String, String> positions = Stream.of(args)
                 .collect(toMap(k -> k.split(";")[0],
-                                v -> v.split(";")[1]));
+                        v -> v.split(";")[1]));
         int option = -1;
 
         while(true) {
@@ -54,7 +54,7 @@ public class Main {
         }
     }
 
-    private static void startGame(Map<String, String> positions) {
+    private static void startGame(final Map<String, String> position) {
 
         if(nonNull(board)) {
 
@@ -68,11 +68,17 @@ public class Main {
             listSpaces.add(new ArrayList<>());
             for(int j = 0; j < BOARD_LIMIT; j++) {
 
-                String positionConfig = positions.get("%d,%d".formatted(i,j));
+                String positionConfig = position.get("%s, %s".formatted(i, j));
+                if (positionConfig != null) {
+
                 int expected = Integer.parseInt(positionConfig.split(",")[0]);
                 boolean fixed = Boolean.parseBoolean(positionConfig.split(",")[1]);
                 Space currentSpace =  new Space(expected, fixed);
                 listSpaces.get(i).add(currentSpace);
+                } else {
+
+                    listSpaces.get(i).add(new Space(0, false));
+                }
             }
         }
 
@@ -80,7 +86,7 @@ public class Main {
         System.out.println("O jogo está pronto para começar");
     }
 
-    private static void inputNumber() {
+    public static void inputNumber() {
 
         if(isNull(board)) {
 
@@ -92,7 +98,7 @@ public class Main {
         int col = runUntilGetValidNumber(0, 8);
         System.out.println("Informe a linha em que o numero será inserido:");
         int row = runUntilGetValidNumber(0, 8);
-        System.out.printf("Informe o numero que vai entrar na posição [%d, %d]: \n", col, row);
+        System.out.printf("Informe o numero que vai entrar na posição [%s, %s]: \n", col, row);
         int value = runUntilGetValidNumber(1, 9);
 
         if(!board.changeValue(col, row, value)) {
@@ -101,7 +107,7 @@ public class Main {
         }
     }
 
-    private static void removeNumber() {
+    public static void removeNumber() {
 
         if(isNull(board)) {
 
@@ -113,7 +119,7 @@ public class Main {
         int col = runUntilGetValidNumber(0, 8);
         System.out.println("Informe a linha em que o numero será inserido:");
         int row = runUntilGetValidNumber(0, 8);
-        System.out.printf("Informe o numero que vai entrar na posição [%d, %d]: \n", col, row);
+        System.out.printf("Informe o numero que vai entrar na posição [%s, %s]: \n", col, row);
 
         if(!board.clearValue(col, row)) {
 
@@ -122,24 +128,98 @@ public class Main {
     }
 
     private static void showCurrentGame() {
+
+        if(isNull(board)) {
+
+            System.out.println("O jogo ainda não foi iniciado");
+            return;
+        }
+
+        Object[] args = new Object[81];
+        int argPos = 0;
+
+        for(int i = 0; i < BOARD_LIMIT; i++) {
+
+            for(List<Space> col : board.getSpace()) {
+
+                args[argPos++] = " " + ((isNull(col.get(i).getActual())) ? " " : col.get(i).getActual());
+            }
+        }
+
+        System.out.println("Seu jogo da seguinte forma");
+        System.out.printf((BOARD_TEMPLATE) + "\n", args);
     }
 
-    private static void showGameStatus() {
+    public static void showGameStatus() {
+
+        if(isNull(board)) {
+
+            System.out.println("O jogo ainda não foi iniciado");
+            return;
+        }
+
+        System.out.printf("O jogo atualmente se encontra no status %s \n", board.getStatus().getLabel());
+
+        if(board.hasErrors()) {
+
+            System.out.println("O jogo contem erros");
+        } else {
+
+            System.out.println("O jogo não contem erros");
+        }
     }
 
-    private static void clearGame() {
+    public static void clearGame() {
+
+        if(isNull(board)) {
+
+            System.out.println("O jogo ainda não foi iniciado");
+            return;
+        }
+
+        System.out.println("Teria certeza que deseja limpar seu jogo e perder todo o seu progresso?");
+        String confirm = scn.next();
+        while(!confirm.equalsIgnoreCase("sim") && !confirm.equalsIgnoreCase("não")) {
+
+            System.out.println("Informe 'sim' ou 'não'");
+            confirm = scn.next();
+        }
+
+        if(confirm.equalsIgnoreCase("sim")) {
+
+            board.reset();
+        }
     }
 
-    private static void finishGame() {
+    public static void finishGame() {
+
+        if(isNull(board)) {
+
+            System.out.println("O jogo ainda não foi iniciado");
+            return;
+        }
+
+        if(board.gameIsFinished()) {
+
+            System.out.println("Parabens você concluiu o jogo!");
+            showCurrentGame();
+            board = null;
+        } else if(board.hasErrors()) {
+
+            System.out.println("Seu jogo contem erros, certifique seu board e ajuste-o!");
+        } else {
+
+            System.out.println("Você ainda precisa preencher algum espaço");
+        }
     }
 
-    private static int runUntilGetValidNumber(final int min, final int max) {
+    public static int runUntilGetValidNumber(final int min, final int max) {
 
         int current = scn.nextInt();
 
-        while(current < min && current > max) {
+        while(current < min || current > max) {
 
-            System.out.printf("Informe um numero %d e %d \n", min, max);
+            System.out.printf("Informe um numero %s e %s \n", min, max);
             current = scn.nextInt();
         }
 
