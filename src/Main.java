@@ -119,7 +119,6 @@ public class Main {
         int col = runUntilGetValidNumber(0, 8);
         System.out.println("Informe a linha em que o numero será inserido:");
         int row = runUntilGetValidNumber(0, 8);
-        System.out.printf("Informe o numero que vai entrar na posição [%s, %s]: \n", col, row);
 
         if(!board.clearValue(col, row)) {
 
