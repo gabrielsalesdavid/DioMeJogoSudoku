@@ -1,4 +1,4 @@
-package br.com.ui.custom;
+package br.com.ui.custom.panel;
 
 import javax.swing.*;
 import java.awt.*;

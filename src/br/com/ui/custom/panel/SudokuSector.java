@@ -1,17 +1,23 @@
 package br.com.ui.custom.panel;
 
+import br.com.ui.custom.input.NumberText;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.List;
+
+import static java.awt.Color.black;
 
 public class SudokuSector extends JPanel {
 
-    public SudokuSector() {
+    public SudokuSector(final List<NumberText> textFields) {
 
         Dimension dimension = new Dimension(170, 170);
         this.setSize(dimension);
         this.setPreferredSize(dimension);
-        this.setBorder(new LineBorder(Color.black, 2, true));
+        this.setBorder(new LineBorder(black, 2, true));
         this.setVisible(true);
+        textFields.forEach(this::add);
     }
 }
